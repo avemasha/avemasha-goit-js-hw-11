@@ -16,7 +16,7 @@ const refs = {
 };
 refs.form.addEventListener('submit', formSubmit);
 refs.loadMoreBtn.addEventListener('click', onLoadMore);
-refs.input.addEventListener('input', submitButton);
+
 refs.loadMoreBtn.disabled = true;
 let total = 1;
 
@@ -63,11 +63,24 @@ const newImgService = new GetImages();
   evt.preventDefault();
   const { searchQuery } = evt.currentTarget;
   newImgService.query = searchQuery.value.trim();
+
+  if (newImgService.query === '') {
+    Notify.warning('Please, type something :(');
+    return;
+  }
+
   newImgService.resetPage();
   
-  const data = await newImgService.getImages();
- 
-  return await renderImgCards(data.hits);
+  try{
+    const data = await newImgService.getImages();
+    return await renderImgCards(data.hits);
+  }
+  catch {
+    Notify.failure(
+      'Sorry, smth went wrong. Please try again.'
+    );
+    refs.loadMoreBtn.disabled = true;
+  }
 
   
 }
@@ -75,9 +88,17 @@ const newImgService = new GetImages();
 async function onLoadMore() {
   
   newImgService.incrementPage();
-  const data = await newImgService.getImages();
+  try{
+    const data = await newImgService.getImages();
+    return await renderImgCards(data.hits);
+  }
+  catch {
+    Notify.failure(
+      'Sorry, smth went wrong. Please try again.'
+    );
+    refs.loadMoreBtn.disabled = true;
+  }
  
-  return await renderImgCards(data.hits);
   
 }
 function submitButton(evt) {
@@ -126,7 +147,7 @@ async function renderImgCards(images) {
     })
     .join('');
   total -= 1;
-  if (total < 40) {
+  if (total < 40 && total > 0) {
     refs.loadMoreBtn.disabled = true;
     Notify.failure(
       "We're sorry, but you've reached the end of search results."
