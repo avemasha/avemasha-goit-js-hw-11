@@ -28,12 +28,15 @@ class GetImages {
   }
   async getImages() {
     refs.submitBtn.disabled = true;
-    const serverDataURL = `${BASIC_URL}${this.searchQuery}${searchFields}&page=${this.page}&per_page=21`;
+    const serverDataURL = `${BASIC_URL}${this.searchQuery}${searchFields}&page=${this.page}&per_page=40`;
     try {
       const server = await axios.get(serverDataURL);
       const data = await server.data;
-
+      notification()
+    
       return data;
+     
+     
     } catch (error) {
         return Notify('Sorry, something went wrong')
     }
@@ -55,18 +58,27 @@ class GetImages {
 }
 const newImgService = new GetImages();
 
-function formSubmit(evt) {
+ async function formSubmit(evt) {
   refs.loadMoreBtn.disabled = true;
   evt.preventDefault();
   const { searchQuery } = evt.currentTarget;
-  newImgService.query = searchQuery.value;
+  newImgService.query = searchQuery.value.trim();
   newImgService.resetPage();
-  newImgService.getImages().then(data => renderImgCards(data.hits));
+  
+  const data = await newImgService.getImages();
+ 
+  return await renderImgCards(data.hits);
+
+  
 }
 
-function onLoadMore() {
+async function onLoadMore() {
+  
   newImgService.incrementPage();
-  newImgService.getImages().then(data => renderImgCards(data.hits));
+  const data = await newImgService.getImages();
+ 
+  return await renderImgCards(data.hits);
+  
 }
 function submitButton(evt) {
   if (evt.currentTarget.value) {
@@ -114,7 +126,7 @@ async function renderImgCards(images) {
     })
     .join('');
   total -= 1;
-  if (total < 21) {
+  if (total < 40) {
     refs.loadMoreBtn.disabled = true;
     Notify.failure(
       "We're sorry, but you've reached the end of search results."
@@ -141,8 +153,9 @@ function modalListener() {
   });
   galleryLarge.refresh();
 }
-function notification(totalImg, totalHits) {
-  if (newImgService.page > 1 && totalImg === 21) {
+ function notification(totalImg, totalHits) {
+  if ( totalImg === 40) {
     Notify.success(`Hooray! We found ${totalHits} images.`);
   }
 }
+
