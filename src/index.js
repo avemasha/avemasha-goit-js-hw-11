@@ -33,7 +33,7 @@ class GetImages {
       method: 'get',
       url: 'https://pixabay.com/api/',
       params: {
-        key: '34523545-f21683fd59bfc3e4e2549fe07',
+        key: '34463648-52ae7b431b36c8e3f85583ecc',
         q: `${this.searchQuery}`,
         image_type: 'photo',
         orientation: 'horizontal',
@@ -46,6 +46,8 @@ class GetImages {
       const response = await axios(axiosOptions);
 
       const data = response.data;
+
+     
 
       this.incrementPage();
       return data;
@@ -90,12 +92,8 @@ function formSubmit(evt) {
   
 }
 
- function onLoadMore() {
-  
-  newImgService.incrementPage();
-  getImages();
 
-}
+
 function submitButton(evt) {
   if (evt.currentTarget.value) {
     refs.submitBtn.disabled = false;
@@ -125,11 +123,20 @@ async function getImages() {
     refs.loadMoreBtn.disabled = false;
   }
 
+ 
+
   if (isShown >= total) {
     Notify.info("We're sorry, but you've reached the end of search results.");
   }
 }
 
+
+
+function onLoadMore() {
+  newImgService.incrementPage();
+  getImages();
+
+}
 
 
 async function renderImgCards(images) {
