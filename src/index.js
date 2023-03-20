@@ -16,6 +16,7 @@ const refs = {
 };
 refs.form.addEventListener('submit', formSubmit);
 refs.loadMoreBtn.addEventListener('click', onLoadMore);
+refs.input.addEventListener('input', submitButton);
 
 refs.loadMoreBtn.disabled = true;
 
@@ -48,13 +49,18 @@ class GetImages {
 
       const data = response.data;
 
+    
      
 
       this.incrementPage();
       return data;
+     
+      
     } catch (error) {
       console.error(error);
     }
+
+    
   }
 
   resetPage() {
@@ -86,7 +92,7 @@ function formSubmit(evt) {
   
   isShown = 0;
   getImages();
-  renderImgCards(hits);
+  // renderImgCards(hits);
 
   
 }
@@ -96,6 +102,7 @@ function formSubmit(evt) {
 function submitButton(evt) {
   if (evt.currentTarget.value) {
     refs.submitBtn.disabled = false;
+    
   }
 }
 
@@ -103,6 +110,7 @@ async function getImages() {
   refs.loadMoreBtn.disabled = true;
 
   const r = await newImgService.getImages();
+  maxHits = r.totalHits;
   const { hits, total } = r;
   isShown += hits.length;
 
@@ -118,7 +126,7 @@ async function getImages() {
   isShown += hits.length;
 
   if (isShown < total) {
-    Notify.success(`Hooray! We found ${total} images !!!`);
+    Notify.success(`Hooray! We found ${maxHits} images !!!`);
     refs.loadMoreBtn.disabled = false;
   }
 
