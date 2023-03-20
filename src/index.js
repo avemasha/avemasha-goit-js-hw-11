@@ -79,7 +79,7 @@ class GetImages {
 }
 const newImgService = new GetImages();
 
-function formSubmit(evt) {
+async function formSubmit(evt) {
   refs.loadMoreBtn.disabled = true;
   evt.preventDefault();
   const { searchQuery } = evt.currentTarget;
@@ -89,9 +89,11 @@ function formSubmit(evt) {
     Notify.warning('Please, type something :(');
     return;
   }
+
+  
   
   isShown = 0;
-  getImages();
+getImages()
   // renderImgCards(hits);
 
   
@@ -125,7 +127,7 @@ async function getImages() {
   renderImgCards(hits);
   isShown += hits.length;
 
-  if (isShown < total) {
+  if ( newImgService.page > 1 && isShown >= 40) {
     Notify.success(`Hooray! We found ${maxHits} images !!!`);
     refs.loadMoreBtn.disabled = false;
   }
