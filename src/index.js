@@ -18,27 +18,39 @@ refs.form.addEventListener('submit', formSubmit);
 refs.loadMoreBtn.addEventListener('click', onLoadMore);
 
 refs.loadMoreBtn.disabled = true;
-let total = 1;
+
 
 class GetImages {
   constructor() {
     this.searchQuery = '';
     this.page = 1;
     this.newQuery = '';
+    this.PER_PAGE = 40;
   }
   async getImages() {
     refs.submitBtn.disabled = true;
-    const serverDataURL = `${BASIC_URL}${this.searchQuery}${searchFields}&page=${this.page}&per_page=40`;
+    const axiosOptions = {
+      method: 'get',
+      url: 'https://pixabay.com/api/',
+      params: {
+        key: '34523545-f21683fd59bfc3e4e2549fe07',
+        q: `${this.searchQuery}`,
+        image_type: 'photo',
+        orientation: 'horizontal',
+        safesearch: true,
+        page: `${this.page}`,
+        per_page: `${this.PER_PAGE}`,
+      },
+    };
     try {
-      const server = await axios.get(serverDataURL);
-      const data = await server.data;
-      notification()
-    
+      const response = await axios(axiosOptions);
+
+      const data = response.data;
+
+      this.incrementPage();
       return data;
-     
-     
     } catch (error) {
-        return Notify('Sorry, something went wrong')
+      console.error(error);
     }
   }
 
@@ -58,48 +70,31 @@ class GetImages {
 }
 const newImgService = new GetImages();
 
- async function formSubmit(evt) {
+function formSubmit(evt) {
   refs.loadMoreBtn.disabled = true;
   evt.preventDefault();
   const { searchQuery } = evt.currentTarget;
   newImgService.query = searchQuery.value.trim();
-
+  newImgService.resetPage();
   if (newImgService.query === '') {
     Notify.warning('Please, type something :(');
     return;
   }
 
-  newImgService.resetPage();
   
-  try{
-    const data = await newImgService.getImages();
-    return await renderImgCards(data.hits);
-  }
-  catch {
-    Notify.failure(
-      'Sorry, smth went wrong. Please try again.'
-    );
-    refs.loadMoreBtn.disabled = true;
-  }
+  
+  isShown = 0;
+  getImages();
+  renderImgCards(hits);
 
   
 }
 
-async function onLoadMore() {
+ function onLoadMore() {
   
   newImgService.incrementPage();
-  try{
-    const data = await newImgService.getImages();
-    return await renderImgCards(data.hits);
-  }
-  catch {
-    Notify.failure(
-      'Sorry, smth went wrong. Please try again.'
-    );
-    refs.loadMoreBtn.disabled = true;
-  }
- 
-  
+  getImages();
+
 }
 function submitButton(evt) {
   if (evt.currentTarget.value) {
@@ -107,21 +102,41 @@ function submitButton(evt) {
   }
 }
 
-async function renderImgCards(images) {
-  refs.loadMoreBtn.disabled = false;
-  const data = await newImgService.getImages();
-  const allHits = data.hits.length;
-  const maxHits = data.totalHits;
+async function getImages() {
+  refs.loadMoreBtn.disabled = true;
 
-  if (images.length === 0) {
+  const r = await newImgService.getImages();
+  const { hits, total } = r;
+  isShown += hits.length;
+
+  if (!hits.length) {
     Notify.failure(
-      'Sorry, there are no images matching your search query. Please try again.'
+      `Sorry, there are no images matching your search query. Please try again.`
     );
     refs.loadMoreBtn.disabled = true;
+    return;
   }
+
+  renderImgCards(hits);
+  isShown += hits.length;
+
+  if (isShown < total) {
+    Notify.success(`Hooray! We found ${total} images !!!`);
+    refs.loadMoreBtn.disabled = false;
+  }
+
+  if (isShown >= total) {
+    Notify.info("We're sorry, but you've reached the end of search results.");
+  }
+}
+
+
+
+async function renderImgCards(images) {
+ 
   const markup = images
     .map(img => {
-      total += 1;
+     
 
       return ` 
       
@@ -146,16 +161,7 @@ async function renderImgCards(images) {
   </div>`;
     })
     .join('');
-  total -= 1;
-  if (total < 40 && total > 0) {
-    refs.loadMoreBtn.disabled = true;
-    Notify.failure(
-      "We're sorry, but you've reached the end of search results."
-    );
-  }
-
-  notification(total, maxHits);
-  total = 1;
+ 
   if (newImgService.page === 1) {
     cardBox.innerHTML = markup;
   }
@@ -173,10 +179,5 @@ function modalListener() {
     });
   });
   galleryLarge.refresh();
-}
- function notification(totalImg, totalHits) {
-  if ( totalImg === 40) {
-    Notify.success(`Hooray! We found ${totalHits} images.`);
-  }
 }
 
