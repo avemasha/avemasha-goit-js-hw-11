@@ -19,6 +19,7 @@ refs.loadMoreBtn.addEventListener('click', onLoadMore);
 
 refs.loadMoreBtn.disabled = true;
 
+let isShown = 0;
 
 class GetImages {
   constructor() {
@@ -82,8 +83,6 @@ function formSubmit(evt) {
     Notify.warning('Please, type something :(');
     return;
   }
-
-  
   
   isShown = 0;
   getImages();
