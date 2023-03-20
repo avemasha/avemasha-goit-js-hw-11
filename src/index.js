@@ -112,7 +112,7 @@ async function getImages() {
   refs.loadMoreBtn.disabled = true;
 
   const r = await newImgService.getImages();
-  const maxHits = await r.totalHits;
+  const maxHits =  r.totalHits;
   const { hits, total } = r;
   isShown += hits.length;
 
