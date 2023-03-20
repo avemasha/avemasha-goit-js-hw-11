@@ -112,7 +112,7 @@ async function getImages() {
   refs.loadMoreBtn.disabled = true;
 
   const r = await newImgService.getImages();
-  maxHits = r.totalHits;
+  const maxHits = await r.totalHits;
   const { hits, total } = r;
   isShown += hits.length;
 
@@ -127,7 +127,7 @@ async function getImages() {
   renderImgCards(hits);
   isShown += hits.length;
 
-  if ( newImgService.page > 1 && isShown >= 40) {
+  if ( newImgService.page > 1 ) {
     Notify.success(`Hooray! We found ${maxHits} images !!!`);
     refs.loadMoreBtn.disabled = false;
   }
