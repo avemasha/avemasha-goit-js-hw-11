@@ -19,7 +19,6 @@ refs.loadMoreBtn.addEventListener('click', onLoadMore);
 refs.input.addEventListener('input', submitButton);
 
 refs.loadMoreBtn.disabled = true;
-
 let isShown = 0;
 
 class GetImages {
@@ -52,7 +51,7 @@ class GetImages {
     
      
 
-      this.incrementPage();
+      // this.incrementPage();
       return data;
      
       
@@ -79,6 +78,13 @@ class GetImages {
 }
 const newImgService = new GetImages();
 
+
+function submitButton(evt) {
+  if (evt.currentTarget.value) {
+    refs.submitBtn.disabled = false;
+  }
+}
+
 async function formSubmit(evt) {
   refs.loadMoreBtn.disabled = true;
   evt.preventDefault();
@@ -90,30 +96,20 @@ async function formSubmit(evt) {
     return;
   }
 
-  
-  
+   
   isShown = 0;
-getImages()
+  getImages()
   // renderImgCards(hits);
-
-  
 }
 
 
-
-function submitButton(evt) {
-  if (evt.currentTarget.value) {
-    refs.submitBtn.disabled = false;
-    
-  }
-}
 
 async function getImages() {
-  refs.loadMoreBtn.disabled = true;
-
-  const r = await newImgService.getImages();
-  const maxHits =  r.totalHits;
-  const { hits, total } = r;
+  refs.loadMoreBtn.disabled = false;
+  const data = await newImgService.getImages();
+  const allHits = data.hits.length;
+  const maxHits = data.totalHits;
+  const { hits, total } = data;
   isShown += hits.length;
 
   if (!hits.length) {
@@ -141,18 +137,21 @@ async function getImages() {
 
 
 
-function onLoadMore() {
+async function onLoadMore() {
   newImgService.incrementPage();
-  getImages();
+  getImages()
 
 }
 
 
 async function renderImgCards(images) {
- 
+  // refs.loadMoreBtn.disabled = false;
+  // const data = await newImgService.getImages();
+  // const allHits = data.hits.length;
+  // const maxHits = data.totalHits;
   const markup = images
     .map(img => {
-     
+      // total += 1;
 
       return ` 
       
@@ -177,7 +176,16 @@ async function renderImgCards(images) {
   </div>`;
     })
     .join('');
- 
+    // total -= 1;
+
+    // if (total < 40) {
+    //   refs.loadMoreBtn.disabled = true;
+    //   Notify.failure(
+    //     "We're sorry, but you've reached the end of search results."
+    //   );
+    // }
+    // notification(total, maxHits);
+    // total = 1;
   if (newImgService.page === 1) {
     cardBox.innerHTML = markup;
   }
@@ -196,4 +204,8 @@ function modalListener() {
   });
   galleryLarge.refresh();
 }
-
+// function notification(totalImg, totalHits) {
+//   if (newImgService.page > 1 && totalImg === 21) {
+//     Notify.success(`Hooray! We found ${totalHits} images.`);
+//   }
+// }
