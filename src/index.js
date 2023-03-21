@@ -101,7 +101,7 @@ async function formSubmit(evt) {
 
 
 async function getImages() {
-  refs.loadMoreBtn.disabled = false;
+  
   const data = await newImgService.getImages();
   const allHits = data.hits.length;
   const maxHits = data.totalHits;
@@ -129,6 +129,8 @@ async function getImages() {
   if (isShown >= total) {
     Notify.info("We're sorry, but you've reached the end of search results.");
   }
+
+  refs.loadMoreBtn.disabled = false;
 }
 
 
