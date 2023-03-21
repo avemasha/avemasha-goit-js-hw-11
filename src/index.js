@@ -16,7 +16,7 @@ const refs = {
 };
 refs.form.addEventListener('submit', formSubmit);
 refs.loadMoreBtn.addEventListener('click', onLoadMore);
-refs.input.addEventListener('input', submitButton);
+
 
 refs.loadMoreBtn.disabled = true;
 let isShown = 0;
@@ -29,7 +29,7 @@ class GetImages {
     this.PER_PAGE = 40;
   }
   async getImages() {
-    refs.submitBtn.disabled = true;
+   
     const axiosOptions = {
       method: 'get',
       url: 'https://pixabay.com/api/',
@@ -51,7 +51,7 @@ class GetImages {
     
      
 
-      // this.incrementPage();
+
       return data;
      
       
@@ -79,11 +79,7 @@ class GetImages {
 const newImgService = new GetImages();
 
 
-function submitButton(evt) {
-  if (evt.currentTarget.value) {
-    refs.submitBtn.disabled = false;
-  }
-}
+
 
 async function formSubmit(evt) {
   refs.loadMoreBtn.disabled = true;
@@ -99,7 +95,7 @@ async function formSubmit(evt) {
    
   isShown = 0;
   getImages()
-  // renderImgCards(hits);
+  
 }
 
 
@@ -123,7 +119,7 @@ async function getImages() {
   renderImgCards(hits);
   isShown += hits.length;
 
-  if ( newImgService.page > 1 ) {
+  if ( newImgService.page < 2 ) {
     Notify.success(`Hooray! We found ${maxHits} images !!!`);
     refs.loadMoreBtn.disabled = false;
   }
@@ -145,13 +141,10 @@ async function onLoadMore() {
 
 
 async function renderImgCards(images) {
-  // refs.loadMoreBtn.disabled = false;
-  // const data = await newImgService.getImages();
-  // const allHits = data.hits.length;
-  // const maxHits = data.totalHits;
+  
   const markup = images
     .map(img => {
-      // total += 1;
+    
 
       return ` 
       
@@ -176,16 +169,7 @@ async function renderImgCards(images) {
   </div>`;
     })
     .join('');
-    // total -= 1;
-
-    // if (total < 40) {
-    //   refs.loadMoreBtn.disabled = true;
-    //   Notify.failure(
-    //     "We're sorry, but you've reached the end of search results."
-    //   );
-    // }
-    // notification(total, maxHits);
-    // total = 1;
+  
   if (newImgService.page === 1) {
     cardBox.innerHTML = markup;
   }
@@ -204,8 +188,4 @@ function modalListener() {
   });
   galleryLarge.refresh();
 }
-// function notification(totalImg, totalHits) {
-//   if (newImgService.page > 1 && totalImg === 21) {
-//     Notify.success(`Hooray! We found ${totalHits} images.`);
-//   }
-// }
+
