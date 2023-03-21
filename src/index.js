@@ -142,11 +142,12 @@ async function getImages() {
 
 
 
-async function onLoadMore() {
+ function onLoadMore() {
+  
   newImgService.incrementPage();
   getImages()
-
 }
+
 
 
 async function renderImgCards(images) {
