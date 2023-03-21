@@ -102,6 +102,7 @@ async function formSubmit(evt) {
 
 async function getImages() {
   
+  try { 
   const data = await newImgService.getImages();
   const allHits = data.hits.length;
   const maxHits = data.totalHits;
@@ -133,6 +134,10 @@ async function getImages() {
   }
 
   refs.loadMoreBtn.disabled = false;
+} catch {
+  (error) 
+    console.error(error);
+}
 }
 
 
