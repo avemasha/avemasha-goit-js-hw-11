@@ -108,7 +108,7 @@ async function getImages() {
   const { hits, total } = data;
   isShown += hits.length;
 
-  if (!hits.length) {
+  if (hits.length === 0) {
     Notify.failure(
       `Sorry, there are no images matching your search query. Please try again.`
     );
@@ -126,8 +126,10 @@ async function getImages() {
 
  
 
-  if (isShown >= total) {
+  if (  hits.length < 40) {
     Notify.info("We're sorry, but you've reached the end of search results.");
+    refs.loadMoreBtn.disabled = true;
+    return;
   }
 
   refs.loadMoreBtn.disabled = false;
